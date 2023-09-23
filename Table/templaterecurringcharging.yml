@@ -1,0 +1,4 @@
+- AutoInteractDB:
+    table: "Recurring Charging"
+    offer_external_ID: 580153
+    sent_trigger: 7

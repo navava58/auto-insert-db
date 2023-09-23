@@ -1,0 +1,606 @@
+autointeractDB:
+    IP: 10.60.145.16
+    Port: 3306
+    Schema: vocs
+yamlFormat:
+#    extends: default
+    rules:
+#        document-start: disable
+        key-duplicates: enable
+#        new-line-at-end-of-file: disable
+#        line-length: disable
+#        braces: disable
+#        brackets: disable
+#        colons: disable
+#        commas: disable
+#        comments: disable
+#        comments-indentation: disable
+#        document-end: disable
+#        empty-lines: disable
+#        empty-values: disable
+#        float-values: disable
+#        hyphens: disable
+#        indentation: disable
+#        key-ordering: disable
+#        new-lines: disable
+#        octal-values: disable
+#        quoted-strings: disable
+#        trailing-spaces: disable
+#        truthy: disable
+
+templateStructure: ##Cerberus
+    monitorkey:
+        Step:
+            type: dict
+            schema:
+                seleniumMode:
+                    type: string
+                name:
+                    type: string
+                    empty: False
+                    required: True
+                ID:
+                    type: integer
+                category:
+                    type: string
+                EventType:
+                    type: integer
+                EventRequireReserveInfo:
+                    type: string
+                mappingEventActionType:
+                    type: list
+                    schema:
+                        type: string
+    peprule:
+        Step:
+            type: dict
+            schema:
+                seleniumMode:
+                    type: string
+                name:
+                    type: string
+                    empty: False
+                    required: True
+                priority:
+                    type: integer
+                category:
+                    type: string
+                QoS:
+                    type: string
+                monitorkey:
+                    type: string
+                description:
+                    type: string
+                rulebase:
+                    type: list
+                    schema:
+                        type: string
+    pccrule:
+        Step:
+            type: dict
+            schema:
+                seleniumMode:
+                    type: string
+                name:
+                    type: string
+                    empty: False
+                    required: True
+                priority:
+                    type: integer
+                precedence:
+                    type: integer
+                sendtype:
+                    type: string
+                    empty: False
+                    required: True
+                category:
+                    type: string
+                effDate:
+                    type: [ datetime, string ]
+                    #type: string
+                    regex: '[0-3][0-9]/[0-1][0-9]/\d{4}'
+                    #regex: '\d{4}-[0-1][0-9]-[0-3][0-9]'
+                expDate:
+                    type: [ datetime, string ]
+                    #type: string
+                    regex: '[0-3][0-9]/[0-1][0-9]/\d{4}'
+                    #regex: '\d{4}-[0-1][0-9]-[0-3][0-9]'
+                description:
+                    type: string
+    Action:
+        Step:
+            type: dict
+            schema:
+                seleniumMode:
+                    type: string
+                templateAction:
+                    type: string
+                name:
+                    type: string
+                    empty: False
+                    required: True
+                category:
+                    type: string
+                actionType:
+                    type: string
+                description:
+                    type: string
+                currentSortPC:
+                    type: string
+                dynamicReserve:
+                    type: string
+                priorityFilter:
+                    type: string
+                currentReserveInfo:
+                    type: string
+                effDate:
+                    type: [datetime, string]
+                    regex: '[0-3][0-9]/[0-1][0-9]/\d{4}\s[0-2][0-9]:[0-5][0-9]:[0-5][0-9]'
+                expDate:
+                    type: [datetime, string]
+                    regex: '[0-3][0-9]/[0-1][0-9]/\d{4}\s[0-2][0-9]:[0-5][0-9]:[0-5][0-9]'
+                enable:
+                    type: boolean
+                priceComponent:
+                    type: list
+                    schema: {type: string}
+                addPriceComponentFirst:
+                    type: string
+                addPriceComponentAfter:
+                    type: list
+                    schema:
+                        type: dict
+                        schema:
+                            new:
+                                type: string
+                            after:
+                                type: string
+                addPriceComponent:
+                    type: list
+                    schema:
+                        type: string
+                deletePriceComponent:
+                    type: list
+                    schema:
+                        type: string
+                replacePriceComponent:
+                    type: list
+                    schema:
+                        type: dict
+                        schema:
+                            new:
+                                type: string
+                            old:
+                                type: string
+    Offer:
+        Step:
+            type: dict
+            schema:
+                seleniumMode:
+                    type: string
+                templateOffer:
+                    type: string
+                name:
+                    type: string
+                    empty: False
+                    required: True
+                category:
+                    type: string
+                paymentType:
+                    type: string
+                description:
+                    type: string
+                    nullable: True
+                priority:
+                    type: integer
+                expirable:
+                    type: boolean
+                suspendable:
+                    type: boolean
+                state:
+                    type: string
+                    allowed: ['Active', 'Suspend']
+                billingCycle:
+                    type: string
+                externalID:
+                    type: integer
+                effDate:
+                    type: [datetime, string]
+                    regex: '[0-3][0-9]/[0-1][0-9]/\d{4}\s[0-2][0-9]:[0-5][0-9]:[0-5][0-9]'
+                expDate:
+                    type: [datetime, string]
+                    regex: '[0-3][0-9]/[0-1][0-9]/\d{4}\s[0-2][0-9]:[0-5][0-9]:[0-5][0-9]'
+                actionList:
+                    type: list
+                    schema:
+                        type: dict
+                        schema:
+                            actionName:
+                                type: string
+                            allowMM:
+                                type: boolean
+                addAction:
+                    type: list
+                    schema:
+                        type: dict
+                        schema:
+                            actionName:
+                                type: string
+                            allowMM:
+                                type: boolean
+                editAction:
+                    type: list
+                    schema:
+                        type: dict
+                        schema:
+                            actionName:
+                                type: string
+                            allowMM:
+                                type: boolean
+                moreInfo:
+                    type: dict
+                    schema:
+                        specialCalMethod:
+                            type: string
+                        redirectSetting:
+                            type: dict
+                            nullable: True
+                            schema:
+                                enable:
+                                    type: boolean
+                                suspend:
+                                    type: string
+                                normal:
+                                    type: string
+                        offerPackageList:
+                            type: list
+                            nullable: True
+                            schema:
+                                type: dict
+                                schema:
+                                    package:
+                                        type: string
+                                    addOn:
+                                        type: boolean
+                                    exchangeable:
+                                        type: boolean
+    PC:
+        Step:
+            type: dict
+            schema:
+                seleniumMode:
+                    type: string
+                templatePC:
+                    type: string
+                name:
+                    type: string
+                    empty: False
+                    required: True
+                category:
+                    type: string
+                pcType:
+                    type: string
+                description:
+                    type: string
+                    nullable: True
+                block:
+                    type: list
+                    schema: {type: string}
+                addBlockAfter:
+                    type: list
+                    schema:
+                        type: dict
+                        schema:
+                            new:
+                                type: string
+                            after:
+                                type: string
+                addBlock:
+                    type: list
+                    schema:
+                        type: string
+                deleteBlock:
+                    type: list
+                    schema:
+                        type: string
+                replaceBlock:
+                    type: list
+                    schema:
+                        type: dict
+                        schema:
+                            new:
+                                type: string
+                            old:
+                                type: string
+    Block:
+        Step:
+            type: dict
+            schema:
+                seleniumMode:
+                    type: string
+                templateBlock:
+                    type: string
+                name:
+                    type: string
+                    empty: False
+                    required: True
+                category:
+                    type: string
+                blockType:
+                    type: string
+                    allowed: [CHARGE, GRANT, POLICY]
+                description:
+                    type: string
+                    nullable: True
+                filter:
+                    type: string
+                affectedObjectType:
+                    type: string
+                    allowed: [OFFER, BALANCE, PARAMETER]
+                affectedObject:
+                    type: string
+                affectedField:
+                    type: string
+                blockMode:
+                    type: string
+                createNewBalance:
+                    type: boolean
+                isSetBalanceIfNotExist:
+                    type: boolean
+                useSpecialMethod:
+                    type: boolean
+                conditionApplyForEffExpdate:
+                    type: boolean
+                rateTableBasic:
+                    type: list
+                    schema: {type: string}
+                rateTableDiscount:
+                    type: list
+                    schema: {type: string}
+                rateTableCondition:
+                    type: list
+                    schema: {type: string}
+                addRateTableBasicFirst:
+                    type: string
+                addRateTableBasicAfter:
+                    type: list
+                    schema:
+                        type: dict
+                        schema:
+                            new:
+                                type: string
+                            after:
+                                type: string
+                addRateTableBasic:
+                    type: list
+                    schema:
+                        type: string
+                deleteRateTableBasic:
+                    type: list
+                    schema:
+                        type: string
+                replaceRateTableBasic:
+                    type: list
+                    schema:
+                        type: dict
+                        schema:
+                            new:
+                                type: string
+                            old:
+                                type: string
+    RT:
+        Step:
+            type: dict
+            schema:
+                seleniumMode:
+                    type: string
+                templateRT:
+                    type: string
+                name:
+                    type: string
+                    empty: False
+                    required: True
+                category:
+                    type: string
+                externalID:
+                    type: string
+                    nullable: True
+                description:
+                    type: string
+                    nullable: True
+                unitType:
+                    type: string
+                state:
+                    type: string
+                    allowed: [Skip, Deny, Formula]
+                DT:
+                    type: string
+                defaultFormula:
+                    type: dict
+                    nullable: True
+                    schema:
+                        type:
+                            type: string
+                            allowed: [NORMAL_TYPE, SKIP, DENY, EXIT, DYNAMIC]
+                        A:
+                            type: float
+                        B:
+                            type: float
+                        Aparam:
+                            type: string
+                        Bparam:
+                            type: string
+                        per:
+                            type: integer
+                        normalizingValueType:
+                            type: string
+                        formulaErrorCode:
+                            type: string
+                        triggerList:
+                            type: list
+                            nullable: True
+                            schema:
+                                type: string
+                        statisticItem:
+                            type: list
+                            nullable: True
+                            schema:
+                                type: string
+                        advance:
+                            type: dict
+                            nullable: True
+                            schema:
+                                sendRAR:
+                                    type: boolean
+                                isMonitor:
+                                    type: boolean
+                                reservationTime:
+                                    type: integer
+                formula:
+                    type: list
+                    schema:
+                        type: dict
+                        schema:
+                            index:
+                                type: integer
+                            type:
+                                type: string
+                                allowed: [NORMAL_TYPE, SKIP, DENY, EXIT, DYNAMIC]
+                            A:
+                                type: float
+                            B:
+                                type: float
+                            Aparam:
+                                type: string
+                            Bparam:
+                                type: string
+                            per:
+                                type: integer
+                            normalizingValueType:
+                                type: string
+                            formulaErrorCode:
+                                type: string
+                            triggerList:
+                                type: list
+                                nullable: True
+                                schema:
+                                    type: string
+                            statisticItem:
+                                type: list
+                                nullable: True
+                                schema:
+                                    type: string
+                            advance:
+                                type: dict
+                                nullable: True
+                                schema:
+                                    sendRAR:
+                                        type: boolean
+                                    isMonitor:
+                                        type: boolean
+                                    reservationTime:
+                                        type: integer
+    DT:
+        Step:
+            type: dict
+            schema:
+                seleniumMode:
+                    type: string
+                templateDT:
+                    type: string
+                name:
+                    type: string
+                    empty: False
+                    required: True
+                category:
+                    type: string
+                description:
+                    type: string
+                    nullable: True
+                columns:
+                    type: list
+                    schema:
+                        type: dict
+                        schema:
+                            index:
+                                type: integer
+                            normalizerName:
+                                type: string
+                            columnName:
+                                type: string
+                rows:
+                    type: list
+                    schema:
+                        type: dict
+                        schema:
+                            index:
+                                type: integer
+                            valueInColumns:
+                                type: list
+                            default:
+                                type: boolean
+    Norm:
+        Step:
+            type: dict
+            schema:
+                seleniumMode:
+                    type: string
+                templateNorm:
+                    type: string
+                name:
+                    type: string
+                    empty: False
+                    required: True
+                category:
+                    type: string
+                description:
+                    type: string
+                    nullable: True
+                startDate:
+                    type: [ datetime, string ]
+                    regex: \d{4}-[0-1][0-9]-[0-3][0-9]\s[0-2][0-9]:[0-5][0-9]:[0-5][0-9]
+                state:
+                    type: string
+                    allowed: [Static Per Event, Dynamic]
+                inputField:
+                    type: list
+                    schema:
+                        type: dict
+                        schema:
+                            path:
+                                type: string
+                            filter:
+                                type: string
+                output:
+                    type: dict
+                    schema:
+                        listValue:
+                            type: list
+                            schema:
+                                type: dict
+                                schema:
+                                    valueName:
+                                        type: string
+                                    description:
+                                        type: string
+                                    color:
+                                        type: string
+                                        regex: \(\d+,\d+\)
+                        default:
+                            type: string
+                        normTable:
+                            type: list
+                            schema:
+                                type: dict
+                                schema:
+                                    valueName:
+                                        type: string
+                                    isParam:
+                                        type: boolean
+                                    parameterValue:
+                                        type: string
+                                    priority:
+                                        type: integer
+                                    compareType:
+                                        type: string
+                                        allowed: [GREATER, EQUAL, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EXTRACT, PREFIX, SUFFIX, CONTAINS]

@@ -1,0 +1,250 @@
+# - Khong co key: KHONG LAM GI (code so sanh NE)
+# - Co key:
+# + Khong cau hinh value (code check NONE): Xoa
+# + Co value: Cau hinh theo value
+- Step:
+    seleniumMode: DT
+    templateDT: "PCRF. DT Check BalType 505 > minReserve"
+    name: "selenium.0905.01.PCRF.DT Check BalType 984 > minReserve"
+    columns:
+      -
+        index: 1
+        normalizerName: PCRF.Norm Check balType 984> minReserve
+    rows:
+      -
+        index: 1
+        valueInColumns: ['Avail >= MinReserve']
+      -
+        index: 2
+        valueInColumns: ['Avail < MinReserve']
+        default: true
+- Step:
+    seleniumMode: RT
+    templateRT: "PRCR.RT: Avail (505) < minReserve: Deny; esle Peb = Peb_NORMAL_M100RG2"
+    name: "selenium.0905.01.PCRF.RT Avail (984) < minReserve: Deny; esle Peb = Peb_NORMAL_M100RG2"
+    DT: "selenium.0905.01.PCRF.DT Check BalType 984 > minReserve"
+    formula:
+      -
+        index: 1
+        type: NORMAL_TYPE
+        A: 0
+        B: 60
+        per: 1
+        normalizingValueType: (None)
+        formulaErrorCode: --NONE--
+        advance:
+            sendRAR: true
+            isMonitor: true
+      -
+        index: 2
+        type: DENY
+        A: 1
+        B: 0
+        per: 1
+        normalizingValueType: (None)
+        formulaErrorCode: --NONE--
+        advance: #neu ko cau hinh value, reset ve false va xoa reserve
+- Step:
+    seleniumMode: Block
+    templateBlock: "PCRF.Block  Peb = Peb_NORMAL_M100RG2(Avail_505>= minReserve / Deny)"
+    name: "selenium.0905.01.PCRF.Block  Peb = Peb_NORMAL_M100RG2(Avail_984>= minReserve/Deny)"
+    replaceRateTableBasic:
+      - {old: "PRCR.RT: Avail (505) < minReserve: Deny; esle Peb = Peb_NORMAL_M100RG2", new: "selenium.0905.01.PCRF.RT Avail (984) < minReserve: Deny; esle Peb = Peb_NORMAL_M100RG2"}
+- Step:
+    seleniumMode: Block
+    templateBlock: "PCRF. Block Charge PCRF - balType 505"
+    name: "selenium.0905.01.PCRF.Block Charge PCRF BalType 984"
+    affectedObject: "984 PCRF Balance_V120C7"
+- Step:
+    seleniumMode: PC
+    templatePC: "PCRF. PC  PebId = Peb_NORMAL_M100RG2 (Avail >= minReserve/Deny) & Charge BalType 505"
+    name: "selenium.0905.01.PCRF.PC PebId = Peb_NORMAL_M100RG2 (Avail >= minReserve/Deny) & Charge BalType 984"
+    replaceBlock:
+      - {old: "PCRF.Block  Peb = Peb_NORMAL_M100RG2(Avail_505>= minReserve / Deny)", new: "selenium.0905.01.PCRF.Block  Peb = Peb_NORMAL_M100RG2(Avail_984>= minReserve/Deny)"}
+      - {old: "PCRF. Block Charge PCRF - balType 505", new: "selenium.0905.01.PCRF.Block Charge PCRF BalType 984"}
+- Step:
+    seleniumMode: Action
+    templateAction: "PCRF.119.MK = 100: Peb = NORMAL_M100RG2 & ChangeService(Quota = Normal/Exhaust)-Group5 for MT"
+    name: "selenium.0905.01.PCRF.Action MK:100 Peb = NORMAL_M100RG2 for V120C7"
+    replacePriceComponent:
+      - {old: "PCRF. PC  PebId = Peb_NORMAL_M100RG2 (Avail >= minReserve/Deny) & Charge BalType 505", new: "selenium.0905.01.PCRF.PC PebId = Peb_NORMAL_M100RG2 (Avail >= minReserve/Deny) & Charge BalType 984"}
+- Step:
+    seleniumMode: Block
+    templateBlock: "Block Voice Offnet/Military FR BalType 44"
+    name: "selenium.0905.01.Block Voice Offnet/Military FR BalType 280"
+    affectedObject: "280 VOICE OFFNET V120C7"
+- Step:
+    seleniumMode: PC
+    templatePC: "PC Voice Offnet/Military FR BalType 44"
+    name: "selenium.0905.01.PC Voice Offnet/Military FR BalType 280"
+    replaceBlock:
+      - {old: "Block Voice Offnet/Military FR BalType 44", new: "selenium.0905.01.Block Voice Offnet/Military FR BalType 280"}
+- Step:
+    seleniumMode: Action
+    templateAction: "Ac.VOICE ONNET for V100K"
+    name: "selenium.0905.01.Action VOICE for V120C7"
+    priceComponent:
+      - PC Roaming Exit (MO)
+      - PC International Exit
+      - PC Call Prefix 1788 Exit
+      - PC Satellite Exit
+      - PC Call To Vas Exit - Not Deny
+      - selenium.0905.01.PC Voice Offnet/Military FR BalType 280
+      - PC Voice Onnet Fist 20 mins Price On FR BalType 9
+- Step:
+    seleniumMode: RT
+    templateRT: "RT Recurring Bonus 1500 seconds"
+    name: "selenium.0905.01.RT Recurring Bonus 720 seconds"
+    defaultFormula:
+        B: 720
+- Step:
+    seleniumMode: Block
+    templateBlock: "Block Bonus 25 mins - BalType 279"
+    name: "selenium.0905.01.Block Bonus 720 seconds BalType 280"
+    affectedObject: "280 VOICE OFFNET V120C7"
+    replaceRateTableBasic:
+      - {old: "RT Recurring Bonus 1500 seconds", new: "selenium.0905.01.RT Recurring Bonus 720 seconds"}
+- Step:
+    seleniumMode: Block
+    templateBlock: "Block Set effDate BalType 279"
+    name: "selenium.0905.01.Block Set effDate BalType 280"
+    affectedObject: "280 VOICE OFFNET V120C7"
+- Step:
+    seleniumMode: Block
+    templateBlock: "Block Set ExpDate 7 days BalType 279"
+    name: "selenium.0905.01.Block Set ExpDate 7 days BalType 280"
+    affectedObject: "280 VOICE OFFNET V120C7"
+- Step:
+    seleniumMode: Block
+    templateBlock: "PCRF. Block Bonus 1048576 KB - BalType 500"
+    name: "selenium.0905.01.PCRF.Block Bonus 1048576 KB BalType 984"
+    affectedObject: "984 PCRF Balance_V120C7"
+- Step:
+    seleniumMode: Block
+    templateBlock: "PCRF. Block Set quotaMax = 1048576 KB - BalType 500"
+    name: "selenium.0905.01.PCRF.Block Set quotaMax = 1048576 KB BalType 984"
+    affectedObject: "984 PCRF Balance_V120C7"
+- Step:
+    seleniumMode: Block
+    templateBlock: "PCRF. Set Reserve = 0 - BalType 500"
+    name: "selenium.0905.01.PCRF.Block Set Reserve = 0 BalType 984"
+    affectedObject: "984 PCRF Balance_V120C7"
+- Step:
+    seleniumMode: Block
+    templateBlock: "PCRF. Set Consume = 0 - BalType 500"
+    name: "selenium.0905.01.PCRF.Block Set Consume = 0 BalType 984"
+    affectedObject: "984 PCRF Balance_V120C7"
+- Step:
+    seleniumMode: Block
+    templateBlock: "PCRF. Set effDate - balType 500"
+    name: "selenium.0905.01.PCRF.Block Set effDate BalType 984"
+    affectedObject: "984 PCRF Balance_V120C7"
+- Step:
+    seleniumMode: Block
+    templateBlock: "PCRF.Block Set ExpDate (90 Days) - balType 500"
+    name: "selenium.0905.01.PCRF.Block Set ExpDate (90 Days) BalType 984"
+    affectedObject: "984 PCRF Balance_V120C7"
+- Step:
+    seleniumMode: Block
+    templateBlock: "PCRF. Set recurringDay (End Of Day) - balType 500"
+    name: "selenium.0905.01.PCRF.Block Set recurringDay (End Of Day) BalType 984"
+    affectedObject: "984 PCRF Balance_V120C7"
+- Step:
+    seleniumMode: PC
+    templatePC: "PCRF.PC.Register & Recurring for V100K"
+    name: "selenium.0905.01.PC Register & Recurring for V120C7"
+    block:
+      - selenium.0905.01.PCRF.Block Bonus 1048576 KB BalType 984
+      - selenium.0905.01.PCRF.Block Set quotaMax = 1048576 KB BalType 984
+      - selenium.0905.01.PCRF.Block Set Reserve = 0 BalType 984
+      - selenium.0905.01.PCRF.Block Set Consume = 0 BalType 984
+      - selenium.0905.01.PCRF.Block Set effDate BalType 984
+      - selenium.0905.01.PCRF.Block Set ExpDate (90 Days) BalType 984
+      - selenium.0905.01.PCRF.Block Set recurringDay (End Of Day) BalType 984
+      - Block Bonus 1000 mins - BalType 9
+      - Block Set effDate BalType 9
+      - Block Set ExpDate 7 days BalType 9
+      - selenium.0905.01.Block Bonus 720 seconds BalType 280
+      - selenium.0905.01.Block Set effDate BalType 280
+      - selenium.0905.01.Block Set ExpDate 7 days BalType 280
+- Step:
+    seleniumMode: Action
+    templateAction: "PCRF.Ac.Register for V100K"
+    name: "selenium.0905.01.Action Register for V120C7"
+    replacePriceComponent:
+      - {old: "PCRF.PC.Register & Recurring for V100K", new: "selenium.0905.01.PC Register & Recurring for V120C7"}
+- Step:
+    seleniumMode: Action
+    templateAction: "PCRF.Ac.Recurring for V100K"
+    name: "selenium.0905.01.Action Recurring for V120C7"
+    replacePriceComponent:
+      - {old: "PCRF.PC.Register & Recurring for V100K", new: "selenium.0905.01.PC Register & Recurring for V120C7"}
+- Step:
+    seleniumMode: Block
+    templateBlock: "Block Reset BalType 279"
+    name: "selenium.0905.01.Block Reset BalType 280"
+    affectedObject: "280 VOICE OFFNET V120C7"
+- Step:
+    seleniumMode: Block
+    templateBlock: "PCRF. Set Gross = 0 - BalType 500"
+    name: "selenium.0905.01.PCRF.Block Set Gross = 0 BalType 984"
+    affectedObject: "984 PCRF Balance_V120C7"
+- Step:
+    seleniumMode: Block
+    templateBlock: "PCRF. Set quotaMax = 0 - BalType 500"
+    name: "selenium.0905.01.PCRF.Block Set quotaMax = 0 BalType 984"
+    affectedObject: "984 PCRF Balance_V120C7"
+- Step:
+    seleniumMode: Block
+    templateBlock: "Block Set ExpDate Param_CurrentTime"
+    name: "selenium.0905.01.PCRF.Block Set ExpDate=CurrentTime BalType 984"
+    affectedObjectType: BALANCE
+    affectedObject: "984 PCRF Balance_V120C7"
+- Step:
+    seleniumMode: Block
+    templateBlock: "Block Set ExpDate Param_CurrentTime"
+    name: "selenium.0905.01.Block Set ExpDate=CurrentTime BalType 280"
+    affectedObjectType: BALANCE
+    affectedObject: "280 VOICE OFFNET V120C7"
+- Step:
+    seleniumMode: PC
+    templatePC: "PCRF. Cancel Reset BalType 500"
+    name: "selenium.0905.01.PC Cancel Reset BalType 984,9,280 ExpDate=CurrentTime"
+    block:
+      - selenium.0905.01.PCRF.Block Set Reserve = 0 BalType 984
+      - selenium.0905.01.PCRF.Block Set Consume = 0 BalType 984
+      - selenium.0905.01.PCRF.Block Set Gross = 0 BalType 984
+      - selenium.0905.01.PCRF.Block Set quotaMax = 0 BalType 984
+      - selenium.0905.01.PCRF.Block Set ExpDate=CurrentTime BalType 984
+      - Block Reset BalType 9
+      - Block Set ExpDate=CurrentTime BalType 9
+      - selenium.0905.01.Block Reset BalType 280
+      - selenium.0905.01.Block Set ExpDate=CurrentTime BalType 280
+- Step:
+    seleniumMode: Action
+    templateAction: "PCEF.Cancel Reset BalType 500"
+    name: "selenium.0905.01.Action Cancel Reset BalType 984,9,280 ExpDate=CurrentTime"
+    replacePriceComponent:
+      - {old: "PCRF. Cancel Reset BalType 500", new: "selenium.0905.01.PC Cancel Reset BalType 984,9,280 ExpDate=CurrentTime"}
+- Step: ##RT Active Month > 120 Deny
+    seleniumMode: Offer
+    templateOffer: "4GDMS"
+    name: "selenium.0905.01.V120C7"
+    description: SR_VN_20200907_282301
+    priority: 8
+    billingCycle: 7 DAYS
+    externalID: 9990003
+    effDate: 01/08/2022 23:59:59
+    state: Active
+    actionList:
+        -
+            actionName: "selenium.0905.01.PCRF.Action MK:100 Peb = NORMAL_M100RG2 for V120C7"
+        -
+            actionName: selenium.0905.01.Action VOICE for V120C7
+        -
+            actionName: selenium.0905.01.Action Register for V120C7
+        -
+            actionName: selenium.0905.01.Action Recurring for V120C7
+        -
+            actionName: selenium.0905.01.Action Cancel Reset BalType 984,9,280 ExpDate=CurrentTime
+
