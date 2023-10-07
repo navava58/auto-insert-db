@@ -13,6 +13,7 @@ import sys
 import yaml
 import traceback
 from Table.recurring_charging import *
+from Table.recurringsuccess_multicycle import *
 
 class TextHandler(logging.Handler):
     # This class allows you to log to a Tkinter Text or ScrolledText widget
@@ -81,6 +82,7 @@ class wadGUI(tk.Frame):
         self.isShowBrowser = True
         self.root = parent
         self.root.configure(background="black")
+        
 
         # self.root.geometry("800x400")
         self.root.columnconfigure(0)
@@ -177,17 +179,35 @@ class wadGUI(tk.Frame):
 
         self.schema_entry.grid(column=1, row=3, sticky=tk.EW, columnspan=3)
 
+        self.lblusername = tk.Label(self.root, text='Username:', background="pink")
+        self.lblusername.grid(column=0, row=4, sticky=tk.EW, padx=5, pady=5)
+
+        self.usernameavar = tk.StringVar()
+        self.username_entry = ttk.Entry(self.root,
+                                   textvariable=self.usernameavar)
+
+        self.username_entry.grid(column=1, row=4, sticky=tk.EW, columnspan=3)
+
+        self.lblpassword = tk.Label(self.root, text='Password:', background="pink")
+        self.lblpassword.grid(column=0, row=5, sticky=tk.EW, padx=5, pady=5)
+
+        self.passwordvar = tk.StringVar()
+        self.password_entry = ttk.Entry(self.root,
+                                   textvariable=self.passwordvar, show="*")
+
+        self.password_entry.grid(column=1, row=5, sticky=tk.EW, columnspan=3)
+
         self.checkvar = IntVar()
         self.enableLogcheckbox = tk.Checkbutton(self.root, text='Log Enable', onvalue='1', offvalue='0',
                                                 variable=self.checkvar)
-        self.enableLogcheckbox.grid(column=1, row=4, sticky=tk.EW, padx=5, pady=5)
+        self.enableLogcheckbox.grid(column=1, row=6, sticky=tk.EW, padx=5, pady=5)
         self.enableLogcheckbox.select()
 
         self.labelmodelog = tk.Label(self.root, text='Mode Log:')
-        self.labelmodelog.grid(column=2, row=4, sticky=tk.E)
+        self.labelmodelog.grid(column=2, row=6, sticky=tk.E)
 
         self.modeLogcbb = ttk.Combobox(self.root)
-        self.modeLogcbb.grid(column=3, row=4, sticky=tk.E)
+        self.modeLogcbb.grid(column=3, row=6, sticky=tk.E)
         self.modeLogcbb["state"] = "readonly"
         self.modeLogcbb["value"] = (
             'DEBUG',
@@ -202,7 +222,7 @@ class wadGUI(tk.Frame):
 
         self.st = CustomText(self.root, state='normal', background="pink")
         self.st.configure(font='TkFixedFont', width=100)
-        self.st.grid(column=0, row=5, sticky=tk.EW, columnspan=7)
+        self.st.grid(column=0, row=7, sticky=tk.EW, columnspan=7)
 
                 # Create textLogger
         self.text_handler = TextHandler(self.st)
@@ -224,6 +244,8 @@ class wadGUI(tk.Frame):
                 self.IPvar.set(config["autointeractDB"]["IP"])
                 self.portvar.set(config["autointeractDB"]["Port"])
                 self.schemavar.set(config["autointeractDB"]["Schema"])
+                self.usernameavar.set(config["autointeractDB"]["Username"])
+                self.passwordvar.set(config["autointeractDB"]["Password"])
                 self.logger.info("Loaded DB connection: " + self.IPvar.get() + ":" + self.portvar.get() + "/" + self.schemavar.get())
             except yaml.YAMLError as exc:
                 self.logger.error("Loading connection, yaml file error: " + str(exc))
@@ -232,6 +254,7 @@ class wadGUI(tk.Frame):
             except:
                 self.logger.error("There is some error when loading connection")
                 self.logger.error(str(sys.exc_info()))
+
 
     def button_callback(self):
         if self.tempdir_entry.get() == "":
@@ -245,6 +268,8 @@ class wadGUI(tk.Frame):
             deploy_thread.set_IP(self.IPvar.get())
             deploy_thread.set_Port(self.portvar.get())
             deploy_thread.set_Schema(self.schemavar.get())
+            deploy_thread.set_Username(self.usernameavar.get())
+            deploy_thread.set_Passwotd(self.passwordvar.get())
             deploy_thread.start()
             self.monitor(deploy_thread)
             self.button_start["state"] = "disable"
@@ -315,6 +340,8 @@ class Deploy(Thread):
         self.IP = ""
         self.Port = ""
         self.Schema = ""
+        self.Username  = ""
+        self.Password = ""
         self.state = "Begin"
         self.killed = False
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -331,11 +358,32 @@ class Deploy(Thread):
     def set_Schema(self, Schema):
         self.Schema = Schema
 
+    def set_Username(self, Username):
+        self.Username = Username
+
+    def set_Passwotd(self, Password):
+        self.Password = Password
+
     def get_state(self):
         return self.state
 
     def set_state_rerun(self):
         self.state="Rerun"
+    
+    def get_IP(self):
+        return self.IP
+    
+    def get_Port(self):
+        return self.Port
+
+    def get_Scheme(self):
+        return self.Schema
+    
+    def get_Username(self):
+        return self.Username
+    
+    def get_Password(self):
+        return self.Password
 
     def globaltrace(self, frame, event, arg):
         if event == 'call':
@@ -364,18 +412,7 @@ class Deploy(Thread):
                     break
                 time.sleep(5)
             self.logger.debug("runc will be re-run")
-
-        while True:
-            try:
-                time.sleep(10)
-                if self.state == "Rerun":
-                    self.logger.info("Rerun button is clicked, keep brower, title: " + self.root.title)
-                    break
-            except:
-                self.logger.info("Browser quited " + self.root.title)
-                self.state = "Stop"
-                break
-    
+        
     def runc(self):
         sys.settrace(self.globaltrace)
         self.logger.info("AutoInteractDB starts")
@@ -393,6 +430,14 @@ class Deploy(Thread):
                 self.logger.error(exc)
                 self.logger.error(str(sys.exc_info()))
                 exit(1)
+
+        self.state = "Run"
+
+        IP_database = self.get_IP()
+        username = self.get_Username()
+        password = self.get_Password()
+        schema = self.get_Scheme()
+        db = mysql.connect(user=username, password=password, host=IP_database, database=schema)
         try:
             for i in range(0, len(dictConfig)):
                 self.logger.info("Deploy " + str(dictConfig[i]["AutoInteractDB"]))
@@ -408,9 +453,14 @@ class Deploy(Thread):
                 if dictConfig[i]["AutoInteractDB"]["table"] == "Recurring Charging":
                     self.logger.debug("Run to insert into table [" + str(dictConfig[i]["AutoInteractDB"]["table"]) + "]")
                     step = RecurringCharging(dictConfig[i]["AutoInteractDB"])
-                    step.run()
+                    step.run(db)
+                if dictConfig[i]["AutoInteractDB"]["table"] == "RecurringSuccess_MultiCycle":
+                    self.logger.debug("Run to insert into table [" + str(dictConfig[i]["AutoInteractDB"]["table"]) + "]")
+                    step = RecurringSuccessMC(dictConfig[i]["AutoInteractDB"])
+                    step.run(db)
                 self.logger.info("TEMPLATE HAS BEEN DEPLOYED COMPLETELY!!!")
                 self.state = "Finish"
+            db.close()
         except KeyError:
             self.logger.error("One of key doesn't exist in dictConfig")
             pass
@@ -418,6 +468,15 @@ class Deploy(Thread):
             self.logger.error("Exception occured when deploying: " + str(ex))
             self.logger.error(str(sys.exc_info()))
             self.state = "Error"
+
+        while True:
+                time.sleep(20)
+                if self.state == "Rerun":
+                    break
+                else:
+                    self.state = "Stop"
+                    break
+ 
 
 if __name__ == "__main__":
     root = tk.Tk()
