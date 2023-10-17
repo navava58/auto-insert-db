@@ -14,6 +14,11 @@ import yaml
 import traceback
 from Table.recurring_charging import *
 from Table.recurringsuccess_multicycle import *
+from Table.notifyrecurring_multicycle import *
+from Table.recurringsuccess import *
+from Table.notifyrecurring import *
+from Table.beforerecurring import *
+from Table.overthreshold import *
 
 class TextHandler(logging.Handler):
     # This class allows you to log to a Tkinter Text or ScrolledText widget
@@ -304,7 +309,7 @@ class wadGUI(tk.Frame):
             # check the thread every 100ms
             self.after(100, lambda: self.monitor(thread))
             if self.isStopDeploy:
-                thread.kill()
+                thread.set_state_stop()
                 self.isStopDeploy = False
                 self.logger.info("Thread " + thread.getName() + " is being killed. Waiting until thread is stopped.")
             if self.isReRun:
@@ -343,7 +348,6 @@ class Deploy(Thread):
         self.Username  = ""
         self.Password = ""
         self.state = "Begin"
-        self.killed = False
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def set_templateFile(self, templateFileDir):
@@ -369,6 +373,9 @@ class Deploy(Thread):
 
     def set_state_rerun(self):
         self.state="Rerun"
+
+    def set_state_stop(self):
+        self.state="Stop"
     
     def get_IP(self):
         return self.IP
@@ -392,14 +399,11 @@ class Deploy(Thread):
             return None
 
     def localtrace(self, frame, event, arg):
-        if self.killed:
+        if self.state == "Stop":
             self.logger.debug("Closed GUI")
             if event == 'line':
                 raise SystemExit()
         return self.localtrace
-
-    def kill(self):
-        self.killed = True
 
     def run(self):
         while True:
@@ -458,6 +462,26 @@ class Deploy(Thread):
                     self.logger.debug("Run to insert into table [" + str(dictConfig[i]["AutoInteractDB"]["table"]) + "]")
                     step = RecurringSuccessMC(dictConfig[i]["AutoInteractDB"])
                     step.run(db)
+                if dictConfig[i]["AutoInteractDB"]["table"] == "NotifyRecurring_MultiCycle":
+                    self.logger.debug("Run to insert into table [" + str(dictConfig[i]["AutoInteractDB"]["table"]) + "]")
+                    step = NotifyRecurringMC(dictConfig[i]["AutoInteractDB"])
+                    step.run(db)
+                if dictConfig[i]["AutoInteractDB"]["table"] == "RecurringSuccess":
+                    self.logger.debug("Run to insert into table [" + str(dictConfig[i]["AutoInteractDB"]["table"]) + "]")
+                    step = RecurringSuccess(dictConfig[i]["AutoInteractDB"])
+                    step.run(db)
+                if dictConfig[i]["AutoInteractDB"]["table"] == "NotifyRecurring":
+                    self.logger.debug("Run to insert into table [" + str(dictConfig[i]["AutoInteractDB"]["table"]) + "]")
+                    step = NotifyRecurring(dictConfig[i]["AutoInteractDB"])
+                    step.run(db)
+                if dictConfig[i]["AutoInteractDB"]["table"] == "BeforeRecurring":
+                    self.logger.debug("Run to insert into table [" + str(dictConfig[i]["AutoInteractDB"]["table"]) + "]")
+                    step = BeforeRecurring(dictConfig[i]["AutoInteractDB"])
+                    step.run(db)
+                if dictConfig[i]["AutoInteractDB"]["table"] == "OverThreshold":
+                    self.logger.debug("Run to insert into table [" + str(dictConfig[i]["AutoInteractDB"]["table"]) + "]")
+                    step = OverThreshold(dictConfig[i]["AutoInteractDB"])
+                    step.run(db)
                 self.logger.info("TEMPLATE HAS BEEN DEPLOYED COMPLETELY!!!")
                 self.state = "Finish"
             db.close()
@@ -470,12 +494,11 @@ class Deploy(Thread):
             self.state = "Error"
 
         while True:
-                time.sleep(20)
-                if self.state == "Rerun":
-                    break
-                else:
-                    self.state = "Stop"
-                    break
+            time.sleep(10)
+            if self.state == "Rerun":
+                break
+            elif self.state == "Stop":
+                break
  
 
 if __name__ == "__main__":

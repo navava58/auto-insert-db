@@ -1,0 +1,8 @@
+- AutoInteractDB:
+    table: "NotifyRecurring_MultiCycle"
+    enoughMoney: False
+    offer_external_ID: 580153
+    cycle: 6
+    smsRouteId: 0
+    sms_template_code: 630000998
+    message_template: "[<''{IS_SMART_PHONE}'' == ''1''>Viettel TB: Từ 0h-5h ngày dd/mm/yyyy, gói 3UMAX50N sẽ gia hạn với cước phí 150.000đ/90 ngày. Quý khách đảm bảo thuê bao hoạt động 2 chiều và đủ tiền để gói cước gia hạn thành công. Để hủy gia hạn, soạn HUY gửi 191. Lưu ý: Quý khách sẽ không được đăng ký lại nếu gói cước bị hủy. Chi tiết LH 198. Trân trọng.][<''{IS_SMART_PHONE}'' != ''1''>Viettel TB: Tu 0h-5h ngay dd/mm/yyyy, goi 3UMAX50N se gia han voi cuoc phi 150.000d/90 ngay. Quy khach dam bao thue bao hoat dong 2 chieu va du tien de goi cuoc gia han thanh cong. De huy gia han, soan HUY gui 191. Luu y: Quy khach se khong duoc dang ky lai neu goi cuoc bi huy. Chi tiet LH 198. Tran trong.]"

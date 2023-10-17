@@ -1,7 +1,9 @@
 autointeractDB:
-    IP: 10.60.145.16
+    IP: 127.0.0.1
     Port: 3306
-    Schema: vocs
+    Schema: anhnn91
+    Username: anhnn91
+    Password: nhat1998
 yamlFormat:
 #    extends: default
     rules:

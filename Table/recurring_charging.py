@@ -11,10 +11,10 @@ class RecurringCharging:
         self.dictRecurringCharging = recurringchargingObject
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def insert(self):
+    def insert(self, db):
         self.logger.debug("Insert into table [" + self.dictRecurringCharging["table"] + "] with offer_external_id: [" + str(self.dictRecurringCharging["offer_external_ID"]) + "]")
         #db = mysql.connect(user='vocs-silver', password='AhKDYGkBJPre26cBm1Tukg==', host='10.60.142.54', database='vocs')
-        db = mysql.connect(user='root', password='123456a@', host='10.60.145.16',database='vocs')
+        #db = mysql.connect(user='root', password='123456a@', host='10.60.145.16',database='vocs')
         cur = db.cursor()
         cur.execute("INSERT INTO `recurring_charging` (`BILLING_CYCLE_TYPE_ID`, `EVENT_ID`, `REMARK`, `PRIORITY`, `NOTIFY_DAY_BEFORE`, `NOTIFY_BALANCE_QUOTA`, `NOTIFY_END_TIME`, `NOTIFY_TIME_FAIL`, `offer_id`, `TRIGGER_ID`, `sent_trigger`"
                     ", `sent_trigger_fail`, `trigger_id_enough`, `trigger_id_not_enough`, `TRIGGER_ID_SUSPEND`, `trigger_id_fail`, `notify_start_time`, `time_retry`, `re_active`) VALUES (NULL, 1003, NULL, NULL, 1, NULL, 540, NULL, "
@@ -22,14 +22,14 @@ class RecurringCharging:
         db.commit()
         self.logger.debug("Insert completely")
 
-    def run(self):
-        self.insert()
+    def run(self, db):
+        self.insert(db)
         
 
 import logging.config
 
 if __name__ == '__main__':
-
+    db = mysql.connect(user='anhnn91', password='nhat1998', host='127.0.0.1', database='anhnn91')
     #with open('../conf/logging-test.yml', 'r') as f:
     with open('conf/logging-test.yml', 'r') as f:
         try:
@@ -51,7 +51,7 @@ if __name__ == '__main__':
                 if dictConfig[i]["AutoInteractDB"]["table"] == "Recurring Charging":
                     print("run to insert into table recurring charging with offer_external_id [" + str(dictConfig[i]["AutoInteractDB"]["offer_external_ID"]) + "]")
                     recurringcharging = RecurringCharging(dictConfig[i]["AutoInteractDB"])
-                    recurringcharging.run()
+                    recurringcharging.run(db)
             print("Finish")
         except yaml.YAMLError as exc:
             print(exc)

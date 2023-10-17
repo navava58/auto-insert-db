@@ -1,0 +1,6 @@
+- AutoInteractDB:
+    table: "BeforeRecurring"
+    offer_external_ID: 580153
+    smsRouteId: 0
+    sms_template_code: 630000997
+    message_template: "[<''{IS_SMART_PHONE}'' == ''1''>Viettel TB: Từ ngày dd/mm/yyyy, gói 3UMAX70 sẽ kết thúc. Để biết ưu đãi dành riêng cho Quý khách, truy cập https://viettel.vn/goidata hoặc bấm gọi *098#. Chi tiết LH 198. Trân trọng.][<''{IS_SMART_PHONE}'' != ''1''>Viettel TB: Tu ngay dd/mm/yyyy, goi 3UMAX70 se ket thuc. De biet uu dai danh rieng cho Quy khach, truy cap https://viettel.vn/goidata hoac bam goi *098#. Chi tiet LH 198. Tran trong.]"

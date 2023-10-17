@@ -1,0 +1,6 @@
+- AutoInteractDB:
+    table: "RecurringSuccess"
+    offer_external_ID: 580153
+    smsRouteId: 0
+    sms_template_code: 630000997
+    message_template: "[<''{IS_SMART_PHONE}'' == ''1''>Viettel TB: Gói 3UMAX70 đã gia hạn thành công. Truy cập https://viettel.vn/kttk để kiểm tra ưu đãi. Chi tiết LH 198. Trân trọng.][<''{IS_SMART_PHONE}'' != ''1''>Viettel TB: Goi 3UMAX70 da gia han thanh cong. Truy cap https://viettel.vn/kttk de kiem tra uu dai. Chi tiet LH 198. Tran trong.]"
